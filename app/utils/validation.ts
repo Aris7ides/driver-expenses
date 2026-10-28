@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const money = z.number().min(0).max(9999999999.99).refine(
+const money = z.number({ error: 'Introduce un importe numérico.' }).min(0, 'El importe no puede ser negativo.').max(9999999999.99, 'El importe supera el máximo permitido.').refine(
   value => Math.abs(value * 100 - Math.round(value * 100)) < 0.0001,
   'Los importes deben tener como máximo dos decimales.',
 )
@@ -28,7 +28,7 @@ export const tripSchema = z.object({
 
 export const expenseSchema = z.object({
   expense_type_id: identifier.nullable(),
-  spent_at: z.iso.date(),
+  spent_at: z.iso.date({ error: 'Introduce una fecha válida.' }),
   amount: money.refine(value => value > 0, 'El importe debe ser mayor que cero.'),
   refundable_amount: money,
   reimbursed_amount: money,

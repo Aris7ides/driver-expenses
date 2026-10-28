@@ -61,9 +61,24 @@ test('Supabase remoto: CRUD, joins, RLS y referencias entre dos usuarios de prue
       account.expenseId = expense.id
       await account.db.saveExpense(account.tripId, { ...expense, reimbursed_amount: 3 }, expense.id)
       assert.equal(Number((await account.db.expenses(account.tripId))[0].reimbursed_amount), 3)
+      await account.db.collect('trips', account.tripId, 1.25)
+      assert.equal(Number((await account.db.trip(account.tripId)).service_collected), 31.25)
+      await account.db.collect('expenses', expense.id, 2)
+      assert.equal(Number((await account.db.expenses(account.tripId))[0].reimbursed_amount), 5)
+      await assert.rejects(account.db.collect('expenses', expense.id, 1), /supera/)
+      await assert.rejects(account.db.saveTrip({ ...original, service_price: 120, service_collected: 30 }, account.tripId, 30), error => error.code === 'PGRST116')
+      await assert.rejects(account.db.saveExpense(account.tripId, { ...expense, reimbursed_amount: 3 }, expense.id, 3), error => error.code === 'PGRST116')
       assert.ok((await account.db.trips()).every(item => item.user_id === account.userId))
     }
     for (const [account, other] of [[a, b], [b, a]]) {
+      for (const [table, foreignId] of [['trips', other.tripId], ['expenses', other.expenseId]]) {
+        const read = await account.client.from(table).select('id').eq('id', foreignId)
+        assert.equal(read.error, null)
+        assert.equal(read.data.length, 0, 'RLS debe impedir la lectura incluso sin el filtro de propietario del cliente.')
+        const update = await account.client.from(table).update({ notes: 'Intento entre cuentas de prueba' }).eq('id', foreignId).select('id')
+        assert.equal(update.error, null)
+        assert.equal(update.data.length, 0, 'RLS debe impedir la escritura incluso sin el filtro de propietario del cliente.')
+      }
       await assert.rejects(account.db.trip(other.tripId), error => error.code === 'PGRST116')
       assert.equal((await account.db.expenses(other.tripId)).length, 0)
       await assert.rejects(account.db.saveTrip(tripInput, other.tripId), error => error.code === 'PGRST116')

@@ -5,10 +5,13 @@ MVP en Nuxt 4 + Vue 3 + TypeScript + Supabase (PostgreSQL y Auth). Diseño respo
 ## Funcionalidades
 - Inicio de sesión, registro, recuperación de contraseña.
 - Datos privados por usuario mediante políticas PostgreSQL RLS.
-- Dashboard mensual: viajes, precio de servicios, gastos, beneficio operativo y pendiente de cobrar.
+- Dashboard mensual: resultado de viajes finalizados y cancelados, previsión de servicios pendientes y cobros globales.
 - CRUD de viajes: plataforma, fechas, origen/destino, precio, presupuesto, kilómetros, estado, cobros, observaciones.
 - CRUD de gastos asociados: categoría, importe, fecha, concepto, reembolsable parcial, reembolsado parcial y notas.
-- Listados y búsquedas; catálogos administrables con categorías precargadas.
+- Tarjetas móviles y tablas de escritorio; filtros por fechas, plataforma, estado o categoría, paginación de pantalla y exportación CSV de todos los resultados filtrados.
+- Registro rápido de gastos desde Inicio, con viaje en curso prioritario y «Guardar y añadir otro».
+- Pantalla Cobros: servicio y reembolsos por plataforma, cobros parciales e importe pendiente completo.
+- Catálogos administrables: alta, renombrado, activación y desactivación con categorías precargadas.
 - Manifest PWA, iconos y service worker mínimo que cachea solo iconos públicos; interfaz adaptable a móvil. **No hay modo offline para datos privados**.
 
 ## Arranque
@@ -30,7 +33,7 @@ MVP en Nuxt 4 + Vue 3 + TypeScript + Supabase (PostgreSQL y Auth). Diseño respo
 ## Comprobaciones
 - `npm run typecheck`: comprueba TypeScript y las plantillas Vue.
 - `npm run build`: compila la aplicación para producción.
-- `npm test`: pruebas locales de formularios, escrituras, validación, fechas, cálculos, instalación PWA y script administrativo; no contactan con Supabase.
+- `npm test`: pruebas locales de formularios, escrituras, validación, fechas, cálculos, instalación PWA, script administrativo, consultas completas, cobros, sesiones y CSV; no contactan con Supabase.
 - `npm run check:supabase`: comprueba Auth y el acceso anónimo con la configuración local. No modifica registros.
 
 Para comprobar también las lecturas autenticadas y el acceso entre usuarios, crea dos cuentas **de prueba**, confirma sus correos y configura un `.env.test` local (está excluido de Git):
@@ -78,7 +81,18 @@ El script local `scripts/update-user.mjs` utiliza la API administrativa de Supab
 - Beneficio operativo = precio del servicio menos gastos propios, **sin impuestos, costes fijos ni comisiones**.
 - Pendiente de cobrar = servicio pendiente + gastos adelantados reembolsables todavía no reembolsados.
 - `service_collected` y `reimbursed_amount` permiten registrar cobros parciales acumulados, sin historial individual de movimientos (futuro).
-- El resumen mensual agrupa por la fecha local de inicio del viaje. Incluye servicios planificados y en curso, excluye cancelados y muestra los importes acordados; el pendiente se limita a esos viajes, no a toda la deuda histórica.
+- El resumen mensual agrupa por la fecha local de inicio del viaje. Los servicios realizados se limitan a viajes finalizados. El resultado resta sus gastos propios y los de viajes cancelados del mes; los cancelados aportan cero ingresos de servicio.
+- Los servicios planificados o en curso y sus presupuestos se muestran como previsión separada. El presupuesto representa gastos totales previstos, sin anticipar qué parte será reembolsable.
+- Los gastos registrados y el desglose por categoría incluyen todos los estados y pagadores de los viajes de ese mes. El pendiente de cobrar es global, de todos los periodos: excluye servicios cancelados y conserva sus reembolsos pendientes.
+- «Registrar cobro» suma la cantidad recibida al acumulado; «Cobrar todo» aplica el pendiente actual. Las actualizaciones comprueban el saldo y el límite leídos para evitar sobrescribir un cobro concurrente. La edición de los formularios también detecta cambios en los acumulados.
+
+## Datos, navegación y exportación
+
+Las lecturas se recorren en bloques con orden estable hasta agotar los resultados; los totales y los CSV no dependen de la página visible ni del límite por respuesta de Supabase. Las fechas y los filtros de plataforma, estado o categoría se aplican en la consulta, y la búsqueda de texto opera sobre los resultados completos recuperados. Las listas muestran 25 registros por página. Los resúmenes globales siguen recuperando todos los datos del usuario; para historiales muy grandes, una futura mejora sería calcular agregados en PostgreSQL respetando RLS.
+
+Cada consulta sigue protegida por RLS y añade el propietario autenticado. Al cerrar o cambiar de cuenta se desmontan las pantallas privadas y sus formularios. Los formularios avisan antes de descartar cambios, pero no bloquean la salida cuando ha cambiado el propietario de la sesión. No se guardan borradores privados en el navegador.
+
+Los CSV usan UTF-8, separador `;`, coma decimal y escape de celdas de texto que puedan interpretarse como fórmulas. Se descargan localmente y contienen los datos de la selección aplicada.
 
 ## Limitaciones deliberadas del MVP
 No incluye justificantes, OCR, horas, kilómetros de aproximación y regreso, reglas por plataforma, equipos, API externas, facturación, pagos bancarios, importaciones, sincronización offline ni sincronización offline. La instalación PWA está preparada con manifest, iconos PNG y service worker mínimo; la app requiere conexión para gestionar los datos.

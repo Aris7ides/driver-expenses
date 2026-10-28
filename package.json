@@ -9,7 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "typecheck": "nuxt typecheck",
-    "test": "node --test tests/regressions.test.mjs tests/pwa-install.test.mjs tests/update-user.test.mjs",
+    "test": "node --test tests/regressions.test.mjs tests/pwa-install.test.mjs tests/update-user.test.mjs tests/workflows.test.mjs",
     "test:supabase": "node --test tests/supabase.integration.test.mjs",
     "check:supabase": "node scripts/check-supabase.mjs",
     "admin:user": "node scripts/update-user.mjs",

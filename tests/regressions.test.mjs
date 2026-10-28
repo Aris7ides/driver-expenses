@@ -149,7 +149,7 @@ test('los formularios editan únicamente sus campos y conservan el catálogo his
       { id: expenseId, name: 'Desactivado', active: false },
       { id: tripId, name: 'Activo', active: true },
     ]
-    const globals = { ...helpers, computed, reactive, ref, watch, onMounted: hook => hooks.push(hook), useDb: () => db }
+    const globals = { ...helpers, computed, reactive, ref, watch, onMounted: hook => hooks.push(hook), useDb: () => db, useDirtyForm: () => ({ dirty: ref(false), confirmLeave: () => true, markSaved() {} }) }
     const component = evaluate(compiled.content, `${name}.ts`, globals).default
     const bindings = component.setup({ initial, tripId }, { expose() {}, emit() {} })
     await Promise.all(hooks.map(hook => hook()))

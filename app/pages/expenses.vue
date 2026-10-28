@@ -1,8 +1,0 @@
-<script setup lang="ts">
-import type { Expense, Trip } from '~/types/models'
-const db = useDb(), items = ref<Expense[]>([]), trips = ref<Trip[]>([]), busy = ref(true), error = ref(''), search = ref('')
-onMounted(async () => { try { [items.value, trips.value] = await Promise.all([db.expenses(), db.trips()]) } catch(e) { error.value = message(e) } finally { busy.value = false } })
-const map = computed(() => new Map(trips.value.map(t => [t.id, `${t.origin} → ${t.destination}`])))
-const filtered = computed(() => items.value.filter(e => `${e.description || ''} ${e.expense_type?.name || ''} ${map.value.get(e.trip_id) || ''}`.toLowerCase().includes(search.value.toLowerCase())))
-</script>
-<template><div class="page-heading"><div><h1>Gastos</h1><p class="muted">Consulta los gastos de todos tus traslados.</p></div></div><div class="card filters"><input v-model="search" placeholder="Buscar gastos..." /></div><div v-if="error" class="alert danger">{{error}}</div><div v-if="busy" class="empty">Cargando gastos...</div><div v-else-if="!filtered.length" class="card empty">Todavía no hay gastos. Puedes añadirlos desde el detalle de un viaje.</div><div v-else class="card table-wrap"><table><thead><tr><th>Fecha</th><th>Viaje</th><th>Tipo</th><th>Concepto</th><th>Importe</th><th>Reembolsable</th><th></th></tr></thead><tbody><tr v-for="e in filtered" :key="e.id"><td>{{shortDate(e.spent_at)}}</td><td>{{map.get(e.trip_id) || '—'}}</td><td>{{e.expense_type?.name || 'Otros'}}</td><td>{{e.description || '—'}}</td><td>{{euro(e.amount)}}</td><td>{{euro(e.refundable_amount)}}</td><td><NuxtLink class="text-link" :to="`/trips/${e.trip_id}`">Ver viaje →</NuxtLink></td></tr></tbody></table></div></template>
