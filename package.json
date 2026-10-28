@@ -9,11 +9,12 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "typecheck": "nuxt typecheck",
-    "test": "node --test tests/regressions.test.mjs",
+    "test": "node --test tests/regressions.test.mjs tests/pwa-install.test.mjs tests/update-user.test.mjs",
     "test:supabase": "node --test tests/supabase.integration.test.mjs",
     "check:supabase": "node scripts/check-supabase.mjs",
     "admin:user": "node scripts/update-user.mjs",
-    "test:admin": "node --test tests/update-user.test.mjs"
+    "test:admin": "node --test tests/update-user.test.mjs",
+    "test:pwa": "node --test tests/pwa-install.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",

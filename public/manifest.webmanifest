@@ -1,6 +1,9 @@
 {
   "name": "MiRuta · Viajes y gastos",
   "short_name": "MiRuta",
+  "id": "/",
+  "scope": "/",
+  "description": "Controla tus viajes, gastos y rentabilidad como conductor autónomo.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f7fc",

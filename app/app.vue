@@ -1,1 +1,1 @@
-<template><NuxtLayout><NuxtPage /></NuxtLayout></template>
+<template><NuxtLayout><NuxtPage /></NuxtLayout><ClientOnly><PwaInstallBanner /><PwaInstallHelp /></ClientOnly></template>

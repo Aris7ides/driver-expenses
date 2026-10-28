@@ -30,7 +30,7 @@ MVP en Nuxt 4 + Vue 3 + TypeScript + Supabase (PostgreSQL y Auth). Diseño respo
 ## Comprobaciones
 - `npm run typecheck`: comprueba TypeScript y las plantillas Vue.
 - `npm run build`: compila la aplicación para producción.
-- `npm test`: pruebas locales de formularios, escrituras, validación, fechas y cálculos; no contactan con Supabase.
+- `npm test`: pruebas locales de formularios, escrituras, validación, fechas, cálculos, instalación PWA y script administrativo; no contactan con Supabase.
 - `npm run check:supabase`: comprueba Auth y el acceso anónimo con la configuración local. No modifica registros.
 
 Para comprobar también las lecturas autenticadas y el acceso entre usuarios, crea dos cuentas **de prueba**, confirma sus correos y configura un `.env.test` local (está excluido de Git):
@@ -47,6 +47,16 @@ Vuelve a ejecutar `npm run check:supabase`. Para verificar además el CRUD real,
 En PowerShell con ejecución de scripts deshabilitada, usa `npm.cmd` en lugar de `npm`.
 
 Si el login funciona pero las tablas devuelven `403 / 42501` (`permission denied for table`), aplica la migración `supabase/migrations/202610280002_authenticated_access.sql` en el SQL Editor del proyecto. Concede los permisos CRUD al rol `authenticated`, mantiene RLS habilitado y cierra el acceso anónimo a esas tablas. Después repite las comprobaciones. No vuelvas a ejecutar la migración inicial si las tablas ya existen.
+
+## Instalación desde el móvil
+
+En una visita móvil por HTTPS, MiRuta recomienda la instalación después de seis segundos en el login o el inicio. El aviso se oculta mientras se editan campos y no aparece en los formularios de viajes o gastos. «Ahora no» y el botón de cierre aplazan la recomendación siete días en ese navegador. La opción de instalación sigue disponible desde Ajustes.
+
+En navegadores que ofrecen `beforeinstallprompt`, «Instalar MiRuta» abre el diálogo nativo tras el clic. En iPhone se muestra la guía de Safari → Compartir → Añadir a pantalla de inicio; en otros navegadores se ofrecen sus pasos de instalación. Si se abre desde un navegador integrado en otra aplicación, se recomienda abrir la dirección en el navegador habitual.
+
+El aviso se suprime al abrir MiRuta en modo `standalone` (incluida la propiedad de Safari en iOS), o si ese navegador ha notificado su instalación. Esta detección no es universal entre navegadores o entre el sitio y la app instalada en iPhone. No se almacenan datos personales para estas preferencias y no se incorpora modo offline. La instalación real debe comprobarse en dispositivos Android e iPhone desde una dirección HTTPS; abrir una IP de la red local por HTTP no ofrece la misma experiencia.
+
+`npm run test:pwa` comprueba las decisiones de instalación, los eventos, el aplazamiento y la visibilidad del aviso con un navegador simulado. Estas pruebas no sustituyen la validación del diálogo nativo en dispositivos reales.
 
 ## Cambiar el correo o contraseña de un usuario
 
