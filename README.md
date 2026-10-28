@@ -48,6 +48,19 @@ En PowerShell con ejecución de scripts deshabilitada, usa `npm.cmd` en lugar de
 
 Si el login funciona pero las tablas devuelven `403 / 42501` (`permission denied for table`), aplica la migración `supabase/migrations/202610280002_authenticated_access.sql` en el SQL Editor del proyecto. Concede los permisos CRUD al rol `authenticated`, mantiene RLS habilitado y cierra el acceso anónimo a esas tablas. Después repite las comprobaciones. No vuelvas a ejecutar la migración inicial si las tablas ya existen.
 
+## Cambiar el correo o contraseña de un usuario
+
+El script local `scripts/update-user.mjs` utiliza la API administrativa de Supabase para actualizar una cuenta existente por su UID, conservando sus viajes y gastos. No se ejecuta desde la aplicación web ni forma parte de sus endpoints.
+
+1. Copia `.env.admin.example` a `.env.admin` si no existe. Este archivo está excluido de Git.
+2. En `.env.admin`, rellena `SUPABASE_SECRET_KEY` con una clave **secret** (`sb_secret_...`) o **service_role** del proyecto. Nunca uses un nombre de variable `NUXT_PUBLIC_` para esta clave. La URL se toma de `.env`.
+3. Copia el UID de la cuenta desde **Authentication → Users** a `MIRUTA_ADMIN_USER_ID`. Puedes rellenar `MIRUTA_ADMIN_EXPECTED_EMAIL` con el correo actual para comprobar la cuenta elegida.
+4. Rellena `MIRUTA_ADMIN_NEW_EMAIL`, `MIRUTA_ADMIN_NEW_PASSWORD` o ambos. Deja vacío lo que no quieras cambiar y conserva las comillas si la contraseña contiene `#` o espacios.
+5. Ejecuta `npm run admin:user -- --dry-run` para consultar la cuenta y revisar el cambio sin aplicarlo.
+6. Ejecuta `npm run admin:user` para aplicar el cambio.
+
+`MIRUTA_ADMIN_CONFIRM_EMAIL=true` marca el nuevo correo como confirmado directamente, sin verificar el buzón mediante un enlace. El cambio es administrativo. Si solo cambias la contraseña, el estado del correo se conserva. El script no imprime la contraseña ni la clave. Después de usarlo, vacía los nuevos valores en `.env.admin` para evitar repetir el cambio por accidente. Para comprobar el script sin tocar cuentas reales: `npm run test:admin`.
+
 ## Modelo económico
 - Ingresos: precio acordado del servicio (no equivale a importe cobrado).
 - Gastos: importe de cada gasto registrado.
