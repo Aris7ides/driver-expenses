@@ -1,0 +1,27 @@
+{
+  "name": "driver-expenses",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck",
+    "test": "node --test tests/regressions.test.mjs",
+    "test:supabase": "node --test tests/supabase.integration.test.mjs",
+    "check:supabase": "node scripts/check-supabase.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0",
+    "lucide-vue-next": "^0.468.0",
+    "nuxt": "^4.1.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "^5.8.0",
+    "vue-tsc": "^2.2.0"
+  }
+}

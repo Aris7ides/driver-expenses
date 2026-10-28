@@ -1,0 +1,7 @@
+export type TripStatus = 'planificado' | 'en_curso' | 'finalizado' | 'cancelado'
+export type Platform = { id: string; user_id: string; name: string; active: boolean; created_at?: string }
+export type ExpenseType = { id: string; user_id: string; name: string; active: boolean; created_at?: string }
+export type Trip = { id: string; user_id: string; platform_id: string | null; origin: string; destination: string; start_at: string; end_at: string | null; status: TripStatus; estimated_budget: number; service_price: number; service_collected: number; kilometers: number | null; external_reference: string | null; notes: string | null; created_at: string; platform?: Platform | null }
+export type Expense = { id: string; user_id: string; trip_id: string; expense_type_id: string | null; spent_at: string; amount: number; refundable_amount: number; reimbursed_amount: number; description: string | null; notes: string | null; paid_by_driver: boolean; created_at: string; expense_type?: ExpenseType | null }
+export type TripInput = Pick<Trip,'platform_id'|'origin'|'destination'|'start_at'|'end_at'|'status'|'estimated_budget'|'service_price'|'service_collected'|'kilometers'|'external_reference'|'notes'>
+export type ExpenseInput = Pick<Expense,'expense_type_id'|'spent_at'|'amount'|'refundable_amount'|'reimbursed_amount'|'description'|'notes'|'paid_by_driver'>
